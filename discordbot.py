@@ -2,8 +2,7 @@ import discord
 from discord.ext import commands
 import os
 import random
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -12,17 +11,6 @@ load_dotenv()
 # Set command prefix and bot token from environment variables
 PREFIX = os.getenv('PREFIX')
 TOKEN = os.getenv('TOKEN')
-
-# Set up Google Sheets API credentials
-scopes = ['https://www.googleapis.com/auth/spreadsheets.readonly']
-creds = ServiceAccountCredentials.from_json_keyfile_name('daylighttmr-bcd50a44ed0c.json', scopes)
-client = gspread.authorize(creds)
-
-sheet_id = '17hI1pPPxGqAtPJuJzT9eP8ZbJeNE9eOmsFbLjk5Fo58'
-sheet = client.open_by_key(sheet_id).sheet1
-
-# Write to a cell in the Google Sheet
-sheet.update_cell(1, 1, 'Hello, world!')
 
 # Create bot instance
 bot = commands.Bot(command_prefix=PREFIX)
@@ -47,8 +35,8 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # Roll 2d6 dice
-@bot.command(name='rolldice')
-async def rolldice(ctx):
+@bot.command(name='roll')
+async def roll(ctx):
     dice1 = random.randint(1, 6)
     dice2 = random.randint(1, 6)
     dice_sum = dice1 + dice2
