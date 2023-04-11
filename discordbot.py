@@ -1,43 +1,37 @@
-from cmath import log
-from distutils.sysconfig import PREFIX
 import discord
 from dotenv import load_dotenv
 import os
-load_dotenv()
 import random
-import discord
 from discord.ext import commands
 
+load_dotenv()
+TOKEN = os.getenv('TOKEN')
 bot = commands.Bot(command_prefix='!')
 
-PREFIX = os.environ['PREFIX']
-TOKEN = os.environ['TOKEN']
-client = discord.Client()
-
-@client.event
+@bot.event
 async def on_ready():
-    print(f'Logged in as {client.user}.')
+    print(f'Logged in as {bot.user}.')
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-
-    if message.content == f'{PREFIX}call':
-        await message.channel.send("callback!")
-
-    if message.content.startswith(f'{PREFIX}hello'):
-        await message.channel.send('Hello!')
-        
 @bot.command(name='roll_dice')
 async def roll_dice(ctx):
     dice1 = random.randint(1, 6)
     dice2 = random.randint(1, 6)
     dice_sum = dice1 + dice2
     await ctx.send(f"You rolled {dice1} and {dice2}. The total is {dice_sum}!")
-    
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    if message.content == f'{bot.command_prefix}call':
+        await message.channel.send("callback!")
+
+    if message.content.startswith(f'{bot.command_prefix}hello'):
+        await message.channel.send('Hello!')
 
 try:
-    client.run(TOKEN)
+    bot.run(TOKEN)
 except discord.errors.LoginFailure as e:
     print("Improper token has been passed.")
+    print(e)
