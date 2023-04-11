@@ -24,6 +24,13 @@ async def on_message(message):
 
     if message.content.startswith(f'{PREFIX}hello'):
         await message.channel.send('Hello!')
+        
+@bot.command(name='roll_dice')
+async def roll_dice(ctx):
+    dice1 = random.randint(1, 6)
+    dice2 = random.randint(1, 6)
+    dice_sum = dice1 + dice2
+    await ctx.send(f"You rolled {dice1} and {dice2}. The total is {dice_sum}!")
     
 
 try:
