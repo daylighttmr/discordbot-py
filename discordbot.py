@@ -38,7 +38,7 @@ async def on_message(message):
         await message.channel.send('Hello!')
 
 try:
-    bot.run(TOKEN)
+    bot.run(MTA5MjI3Mzc1NTQzNjM2MzgxNw.GGNE7q.QKuw00yBfQSi-MHpyAgKD6oiBSwClm_nXIPIEo)
 except discord.errors.LoginFailure as e:
     print("Improper token has been passed.")
     print(e)
