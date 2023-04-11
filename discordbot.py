@@ -1,44 +1,32 @@
+from cmath import log
+from distutils.sysconfig import PREFIX
 import discord
-from discord.ext import commands
-import re
-import random
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
-bot = commands.Bot(command_prefix='!')
+PREFIX = os.environ['PREFIX']
+TOKEN = os.environ['TOKEN']
 
-@bot.event
+client = discord.Client()
+
+@client.event
 async def on_ready():
-    print(f'Logged in as {bot.user}.')
+    print(f'Logged in as {client.user}.')
 
-@bot.command(name='sum')
-async def sum_numbers(ctx):
-    # Find all numbers in the message and sum them
-    message = ctx.message.content
-    numbers = re.findall(r'\d+', message)
-    sum_of_numbers = sum(map(int, numbers))
-    await ctx.send(f'The sum of the numbers in your message is {sum_of_numbers}!')
-
-@bot.command(name='roll')
-async def roll_dice(ctx):
-    # Roll 2d6 dice
-    dice1 = random.randint(1, 6)
-    dice2 = random.randint(1, 6)
-    dice_sum = dice1 + dice2
-    await ctx.send(f"You rolled {dice1} and {dice2}. The total is {dice_sum}!")
-
-
-@bot.event
+@client.event
 async def on_message(message):
-    if message.author == bot.user:
+    if message.author == client.user:
         return
 
-    if message.content == f'{bot.command_prefix}call':
+    if message.content == f'{PREFIX}call':
         await message.channel.send("callback!")
 
-    if message.content.startswith(f'{bot.command_prefix}hello'):
+    if message.content.startswith(f'{PREFIX}hello'):
         await message.channel.send('Hello!')
 
+
 try:
-    bot.run(MTA5MjI3Mzc1NTQzNjM2MzgxNw.GGNE7q.QKuw00yBfQSi-MHpyAgKD6oiBSwClm_nXIPIEo)
+    client.run(TOKEN)
 except discord.errors.LoginFailure as e:
     print("Improper token has been passed.")
-    print(e)
