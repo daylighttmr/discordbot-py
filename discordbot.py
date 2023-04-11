@@ -1,22 +1,28 @@
-from cmath import log
-from distutils.sysconfig import PREFIX
 import discord
-from dotenv import load_dotenv
+from discord.ext import commands
 import os
+import random
+
+# Load environment variables
+from dotenv import load_dotenv
 load_dotenv()
 
-PREFIX = os.environ['PREFIX']
-TOKEN = os.environ['TOKEN']
+# Set command prefix and bot token from environment variables
+PREFIX = os.getenv('PREFIX')
+TOKEN = os.getenv('TOKEN')
 
-client = discord.Client()
+# Create bot instance
+bot = commands.Bot(command_prefix=PREFIX)
 
-@client.event
+# Print bot information when ready
+@bot.event
 async def on_ready():
-    print(f'Logged in as {client.user}.')
+    print(f'Logged in as {bot.user}.')
 
-@client.event
+# Respond to messages
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
 
     if message.content == f'{PREFIX}call':
@@ -25,8 +31,15 @@ async def on_message(message):
     if message.content.startswith(f'{PREFIX}hello'):
         await message.channel.send('Hello!')
 
+    await bot.process_commands(message)
 
-try:
-    client.run(TOKEN)
-except discord.errors.LoginFailure as e:
-    print("Improper token has been passed.")
+# Roll 2d6 dice
+@bot.command(name='rolldice')
+async def rolldice(ctx):
+    dice1 = random.randint(1, 6)
+    dice2 = random.randint(1, 6)
+    dice_sum = dice1 + dice2
+    await ctx.send(f"You rolled {dice1} and {dice2}. The total is {dice_sum}!")
+
+# Run the bot
+bot.run(TOKEN)
