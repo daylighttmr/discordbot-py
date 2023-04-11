@@ -12,8 +12,8 @@ bot = commands.Bot(command_prefix='!')
 async def on_ready():
     print(f'Logged in as {bot.user}.')
 
-@bot.command(name='roll_dice')
-async def roll_dice(ctx):
+@bot.command(name='roll')
+async def roll(ctx):
     dice1 = random.randint(1, 6)
     dice2 = random.randint(1, 6)
     dice_sum = dice1 + dice2
