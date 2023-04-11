@@ -25,9 +25,6 @@ async def on_message(message):
     if message.content.startswith(f'{PREFIX}hello'):
         await message.channel.send('Hello!')
     
-        if message.content.endswith(f'{PREFIX}hello'):
-        await message.author.send('Hello!')
-
 
 try:
     client.run(TOKEN)
