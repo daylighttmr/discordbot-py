@@ -3,7 +3,7 @@ from discord.ext import commands
 import os
 import random
 import gspread
-from google.oauth2.service_account import Credentials
+from google.oauth2.service_account import ServiceAccountCredentials
 
 # Load environment variables
 from dotenv import load_dotenv
