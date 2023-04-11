@@ -64,15 +64,9 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    # Check if the message starts with the command prefix and the command is "go"
-    if message.content.startswith('!go'):
-        # Choose a random paragraph from the list
+    if message.content.startswith(f'{PREFIX}go'):
         random_paragraph = random.choice(paragraphs)
-        
-        # Create an embed with the paragraph as the description and "Random Paragraph" as the title
         embed = discord.Embed(title="Random Paragraph", description=random_paragraph)
-        
-        # Send the embed to the same channel where the message was received
         await message.channel.send(embed=embed)
 
 # Run the bot
