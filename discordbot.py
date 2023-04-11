@@ -43,12 +43,16 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # Roll 2d6 dice
-@bot.command(name='roll')
-async def roll(ctx):
+@bot.command(name='add_dice')
+async def add_dice(ctx, num1: int, num2: int):
     dice1 = random.randint(1, 6)
     dice2 = random.randint(1, 6)
-    dice_sum = dice1 + dice2
-    await ctx.send(f"You rolled {dice1} and {dice2}. The total is {dice_sum}!")
+    dice_sum = dice1 + dice2 + num1 + num2
+    
+    if dice_sum > 8:
+        await ctx.send(f"You rolled {dice1} and {dice2}. The total is {dice_sum}! 일반 성공!")
+    else:
+        await ctx.send(f"You rolled {dice1} and {dice2}. The total is {dice_sum}!")
 
 # Random paragraph
 paragraphs = [
