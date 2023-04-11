@@ -4,11 +4,15 @@ import discord
 from dotenv import load_dotenv
 import os
 load_dotenv()
+import random
+import discord
+from discord.ext import commands
+
+bot = commands.Bot(command_prefix='!')
 
 PREFIX = os.environ['PREFIX']
 TOKEN = os.environ['TOKEN']
 client = discord.Client()
-def bot = commands.Bot(command_prefix='!')
 
 @client.event
 async def on_ready():
