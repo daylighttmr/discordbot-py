@@ -40,8 +40,9 @@ async def rolldice(ctx):
     dice2 = random.randint(1, 6)
     dice_sum = dice1 + dice2
     await ctx.send(f"You rolled {dice1} and {dice2}. The total is {dice_sum}!")
-    
-    paragraphs = [
+
+# Random paragraph
+paragraphs = [
     "This is the first paragraph.",
     "Here is another paragraph.",
     "This is the third paragraph.",
@@ -49,25 +50,11 @@ async def rolldice(ctx):
     "And finally, a fifth paragraph."
 ]
 
-# Create a Discord client
-client = discord.Client()
-
-# Event listener for when the bot is ready
-@client.event
-async def on_ready():
-    print(f'Logged in as {client.user}.')
-
-# Event listener for when a message is received
-@client.event
-async def on_message(message):
-    # Ignore messages sent by the bot itself
-    if message.author == client.user:
-        return
-
-    if message.content.startswith(f'{PREFIX}go'):
-        random_paragraph = random.choice(paragraphs)
-        embed = discord.Embed(title="Random Paragraph", description=random_paragraph)
-        await message.channel.send(embed=embed)
+@bot.command(name='go')
+async def random_paragraph(ctx):
+    random_p = random.choice(paragraphs)
+    embed = discord.Embed(title="Random Paragraph", description=random_p)
+    await ctx.send(embed=embed)
 
 # Run the bot
 bot.run(TOKEN)
