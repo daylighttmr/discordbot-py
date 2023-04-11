@@ -87,58 +87,32 @@ async def get_data(ctx):
         await ctx.send('Data from the Google Spreadsheet:')
         for row in data:
             await ctx.send(row)
-
+            
     except Exception as e:
-        print(f'Error: {e}')
-        await ctx.send(f'Error: {e}')
-        
-        
-@bot.command(name='체력')
-async def 체력(ctx):
-    # authenticate and open the spreadsheet
-    scope = ['https://www.googleapis.com/auth/spreadsheets']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('daylighttmr-bcd50a44ed0c.json', scope)
-    client = gspread.authorize(creds)
-    sheet_id = '17hI1pPPxGqAtPJuJzT9eP8ZbJeNE9eOmsFbLjk5Fo58'
-    worksheet_name = str(ctx.author)
-
-    try:
-        worksheet = client.open_by_key(sheet_id).worksheet(worksheet_name)
-    except gspread.exceptions.WorksheetNotFound:
-        await ctx.send(f'No worksheet found for {worksheet_name}.')
-        return
-
-    # get the value of cell F14
-    try:
-        f14_value = worksheet.acell('F14').value
-        await ctx.send(f'The value of F14 in your worksheet is {f14_value}.')
-    except gspread.exceptions.CellNotFound:
-        await ctx.send('F14 is not found in your worksheet.')
-        
-    # 워크시트 등록하기
-    if message.content.startswith(f'{PREFIX}register '):
-        sheet_name = message.content.split(' ')[1]
-        member_sheets[message.author.id] = sheet_name
-        await message.channel.send(f"Registered sheet '{sheet_name}' for user {message.author.name}.")
-
-    await bot.process_commands(message)
+        await ctx.send(f'An error occurred: {e}')
+            
+            # Register user's worksheet name
+@bot.command(name='register')
+async def register_sheet(ctx, sheet_name: str):
+    member_sheets[ctx.author.id] = sheet_name
+    await ctx.send(f"Registered sheet '{sheet_name}' for user {ctx.author.name}.")
 
 # Retrieve data from registered sheet for user who sent command
 @bot.command(name='getdata')
-async def get_data(ctx, cell):
+async def get_data(ctx, cell: str):
     member_id = ctx.author.id
     sheet_name = member_sheets.get(member_id)
     if sheet_name is None:
         await ctx.send("You haven't registered a sheet yet!")
         return
     try:
-        sheet = client.open_by_key('<spreadsheet_id>').worksheet(sheet_name)
-        value = sheet.acell('F14').value
-        await ctx.send(f"The value at in sheet '{sheet_name}' is '{value}'.")
+        worksheet = client.open_by_key(sheet_id).worksheet(sheet_name)
+        value = worksheet.acell(cell).value
+        await ctx.send(f"The value in sheet '{sheet_name}' at cell '{cell}' is '{value}'.")
     except gspread.exceptions.WorksheetNotFound:
         await ctx.send(f"Sheet '{sheet_name}' not found in spreadsheet.")
     except gspread.exceptions.CellNotFound:
-        await ctx.send(f"Cell not found in sheet '{sheet_name}'.")
+        await ctx.send(f"Cell '{cell}' not found in sheet '{sheet_name}'.")
 
 # Run the bot
 bot.run(TOKEN)
