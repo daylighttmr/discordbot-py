@@ -7,8 +7,8 @@ load_dotenv()
 
 PREFIX = os.environ['PREFIX']
 TOKEN = os.environ['TOKEN']
-bot = commands.Bot(command_prefix='!')
 client = discord.Client()
+def bot = commands.Bot(command_prefix='!')
 
 @client.event
 async def on_ready():
