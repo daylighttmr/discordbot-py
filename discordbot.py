@@ -17,6 +17,9 @@ TOKEN = os.getenv('TOKEN')
 # Set up Google Sheets API credentials
 creds = ServiceAccountCredentials.from_json_keyfile_name('daylighttmr-bcd50a44ed0c.json', ['https://www.googleapis.com/auth/spreadsheets'])
 
+# Create dictionary to store member's worksheet names
+member_sheets = {}
+
 # Create bot instance
 bot = commands.Bot(command_prefix=PREFIX)
 
@@ -107,6 +110,31 @@ async def 체력(ctx):
         await ctx.send(f'The value of F14 in your worksheet is {f14_value}.')
     except gspread.exceptions.CellNotFound:
         await ctx.send('F14 is not found in your worksheet.')
+        
+    # 워크시트 등록하기
+    if message.content.startswith(f'{PREFIX}register '):
+        sheet_name = message.content.split(' ')[1]
+        member_sheets[message.author.id] = sheet_name
+        await message.channel.send(f"Registered sheet '{sheet_name}' for user {message.author.name}.")
+
+    await bot.process_commands(message)
+
+# Retrieve data from registered sheet for user who sent command
+@bot.command(name='getdata')
+async def get_data(ctx, cell):
+    member_id = ctx.author.id
+    sheet_name = member_sheets.get(member_id)
+    if sheet_name is None:
+        await ctx.send("You haven't registered a sheet yet!")
+        return
+    try:
+        sheet = client.open_by_key('<spreadsheet_id>').worksheet(sheet_name)
+        value = sheet.acell('F14').value
+        await ctx.send(f"The value at in sheet '{sheet_name}' is '{value}'.")
+    except gspread.exceptions.WorksheetNotFound:
+        await ctx.send(f"Sheet '{sheet_name}' not found in spreadsheet.")
+    except gspread.exceptions.CellNotFound:
+        await ctx.send(f"Cell not found in sheet '{sheet_name}'.")
 
 # Run the bot
 bot.run(TOKEN)
