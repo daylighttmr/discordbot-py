@@ -84,6 +84,29 @@ async def get_data(ctx):
     except Exception as e:
         print(f'Error: {e}')
         await ctx.send(f'Error: {e}')
+        
+        
+@bot.command(name='체력')
+async def 체력(ctx):
+    # authenticate and open the spreadsheet
+    scope = ['https://www.googleapis.com/auth/spreadsheets']
+    creds = ServiceAccountCredentials.from_json_keyfile_name('daylighttmr-bcd50a44ed0c.json', scope)
+    client = gspread.authorize(creds)
+    sheet_id = '17hI1pPPxGqAtPJuJzT9eP8ZbJeNE9eOmsFbLjk5Fo58'
+    worksheet_name = str(ctx.author)
+
+    try:
+        worksheet = client.open_by_key(sheet_id).worksheet(worksheet_name)
+    except gspread.exceptions.WorksheetNotFound:
+        await ctx.send(f'No worksheet found for {worksheet_name}.')
+        return
+
+    # get the value of cell F14
+    try:
+        f14_value = worksheet.acell('F14').value
+        await ctx.send(f'The value of F14 in your worksheet is {f14_value}.')
+    except gspread.exceptions.CellNotFound:
+        await ctx.send('F14 is not found in your worksheet.')
 
 # Run the bot
 bot.run(TOKEN)
