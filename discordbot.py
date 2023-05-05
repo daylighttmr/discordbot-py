@@ -43,7 +43,6 @@ async def on_message(message):
     await bot.process_commands(message)
 
     
-@bot.command(name='1d6')
 @bot.command(name='1D6')
 async def roll_dice(ctx):
     dice_roll = random.randint(1, 6)
@@ -51,7 +50,6 @@ async def roll_dice(ctx):
     
     
 @bot.command(name='2D6')
-@bot.command(name='2d6')
 async def add_dice(ctx, num1: int = 0, num2: int = 0):
     dice1 = random.randint(1, 6)
     dice2 = random.randint(1, 6)
@@ -63,7 +61,6 @@ async def add_dice(ctx, num1: int = 0, num2: int = 0):
         await ctx.send(f"You rolled {dice1} and {dice2}. The total is {dice_sum}!")
 
         
-@bot.command(name='yn')
 @bot.command(name='YN')
 async def yes_or_no(ctx):
     responses = ["Yes", "No", "Maybe", "Definitely", "Never", "Of course", "Absolutely", "Not a chance", "Sure", "Not likely"]
