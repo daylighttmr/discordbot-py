@@ -98,6 +98,10 @@ async def register_sheet(ctx, sheet_name: str):
 @bot.command(name='치료')
 async def get_data_치료(ctx):
     await retrieve_cell_range(ctx, "AJ27:AK27", "치료")
+    dice1 = random.randint(1, 6)
+    dice2 = random.randint(1, 6)
+    skill_sum = dice1 + dice2 + "AJ27:AK27"
+        await ctx.reply(f"🎲 {dice1} , {dice2}. The total is {skill_sum}!")
 
 @bot.command(name='운전')
 async def get_data_운전(ctx):
