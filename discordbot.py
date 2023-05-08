@@ -56,16 +56,16 @@ async def add_dice(ctx, num1: int = 0, num2: int = 0):
     dice_sum = dice1 + dice2 + num1 + num2
     
     if dice_sum > 8:
-        await ctx.author.send(f"🎲 {dice1} , {dice2}. The total is {dice_sum}! 일반 성공!")
+        await ctx.reply(f"🎲 {dice1} , {dice2}. The total is {dice_sum}! 일반 성공!")
     else:
-        await ctx.author.send(f"🎲 {dice1} , {dice2}. The total is {dice_sum}!")
+        await ctx.reply(f"🎲 {dice1} , {dice2}. The total is {dice_sum}!")
 
         
 @bot.command(name='YN')
 async def yes_or_no(ctx):
     responses = ["Yes", "No", "Maybe", "Definitely", "Never", "Of course", "Absolutely", "Not a chance", "Sure", "Not likely"]
     response = random.choice(responses)
-    await ctx.send(response)
+    await ctx.reply(response)
 
 # Random paragraph
 paragraphs = [
@@ -82,50 +82,52 @@ async def random_paragraph(ctx):
     embed = discord.Embed(title="Random Paragraph", description=random_p)
     await ctx.send(embed=embed)
 
-# Get data from Google Spreadsheet
-@bot.command(name='get-data')
-async def get_data(ctx):
+
+# Register user's worksheet
+@bot.command(name='register')
+async def register_sheet(ctx, sheet_name: str):
+    # Save the sheet name in a dictionary with user ID as the key
+    member_id = ctx.author.id
+    member_sheets[member_id] = sheet_name
+    
+    # Reply to the message with the registration confirmation
+    await ctx.reply(f"Registered sheet '{sheet_name}' for user {ctx.author.name}.")
+
+# Get data from registered sheet for the user who sent the command
+@bot.command(name='getdata')
+async def get_data(ctx, cell: str):
+    # Retrieve the sheet name for the user
+    member_id = ctx.author.id
+    sheet_name = member_sheets.get(member_id)
+    
+    # Check if the user has registered a sheet
+    if sheet_name is None:
+        await ctx.reply("You haven't registered a sheet yet!")
+        return
+    
     try:
         # Authenticate with Google Sheets API
         gc = gspread.authorize(creds)
-
+        
         # Open the Google Spreadsheet by ID
-        sheet_id = '17hI1pPPxGqAtPJuJzT9eP8ZbJeNE9eOmsFbLjk5Fo58'
-        worksheet = gc.open_by_key(sheet_id).sheet1
-
-        # Get all data from the first worksheet
-        data = worksheet.get_all_values()
-
-        # Send the data as a Discord message
-        await ctx.send('Data from the Google Spreadsheet:')
-        for row in data:
-            await ctx.send(row)
-            
-    except Exception as e:
-        await ctx.send(f'An error occurred: {e}')
-            
-            # Register user's worksheet name
-@bot.command(name='register')
-async def register_sheet(ctx, sheet_name: str):
-    member_sheets[ctx.author.id] = sheet_name
-    await ctx.send(f"Registered sheet '{sheet_name}' for user {ctx.author.name}.")
-
-# Retrieve data from registered sheet for user who sent command
-@bot.command(name='getdata')
-async def get_data(ctx, cell: str):
-    member_id = ctx.author.id
-    sheet_name = member_sheets.get(member_id)
-    if sheet_name is None:
-        await ctx.send("You haven't registered a sheet yet!")
-        return
-    try:
-        worksheet = client.open_by_key(sheet_id).worksheet(sheet_name)
+        sheet_id = '1zb5gLeAns7CMUGHlk-4cCC9Tf5V2s4nq_K1Ja7p9U4Y'
+        spreadsheet = gc.open_by_key(sheet_id)
+        
+        # Retrieve the worksheet by name
+        worksheet = spreadsheet.worksheet(sheet_name)
+        
+        # Retrieve the value from the specified cell
         value = worksheet.acell(cell).value
-        await ctx.send(f"The value in sheet '{sheet_name}' at cell '{cell}' is '{value}'.")
+        
+        # Reply to the message with the retrieved value
+        await ctx.reply(f"The value in sheet '{sheet_name}' at cell '{cell}' is '{value}'.")
+    
     except gspread.exceptions.WorksheetNotFound:
-        await ctx.send(f"Sheet '{sheet_name}' not found in spreadsheet.")
+        await ctx.reply(f"Sheet '{sheet_name}' not found in the spreadsheet.")
+    
     except gspread.exceptions.CellNotFound:
-        await ctx.send(f"Cell '{cell}' not found in sheet '{sheet_name}'.")
+        await ctx.reply(f"Cell '{cell}' not found in sheet '{sheet_name}'.")
+
 
 # Run the bot
 bot.run(TOKEN)
