@@ -94,6 +94,24 @@ async def register_sheet(ctx, sheet_name: str):
     await ctx.reply(f"Registered sheet '{sheet_name}' for user {ctx.author.name}.")
 
 # Get data from registered sheet for the user who sent the command
+
+@bot.command(name='치료')
+async def get_data_치료(ctx):
+    await retrieve_cell_range(ctx, "AJ27:AK27", "치료")
+
+@bot.command(name='운전')
+async def get_data_운전(ctx):
+    await retrieve_cell_range(ctx, "AJ28:AK28", "운전")
+
+@bot.command(name='손재주')
+async def get_data_손재주(ctx):
+    await retrieve_cell_range(ctx, "AJ26:AK26", "손재주")
+
+async def retrieve_cell_range(ctx, cell_range, command_name):
+    # Retrieve the sheet name for the user
+    member_id = ctx.author.id
+    sheet_name = member_sheets.get(member_id)
+    
 @bot.command(name='getdata')
 async def get_data(ctx, cell: str):
     # Retrieve the sheet name for the user
