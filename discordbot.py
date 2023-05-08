@@ -46,7 +46,7 @@ async def on_message(message):
 @bot.command(name='1D6')
 async def roll_dice(ctx):
     dice_roll = random.randint(1, 6)
-    await ctx.author.send(f"🎲 {dice_roll}!")
+    await ctx.reply(f"🎲 {dice_roll}!")
     
     
 @bot.command(name='2D6')
