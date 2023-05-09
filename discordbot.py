@@ -56,18 +56,18 @@ async def add_dice(ctx, num1: int = 0, num2: int = 0):
     dice_sum = dice1 + dice2 + num1 + num2
     
     if dice_sum >= 12:
-        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, *특별 성공*")
+        await ctx.reply(f"🎲 {dice1} , {dice2}. \r 결과는 {dice_sum}, :star2: *특별 성공* :star2:")
     elif dice_sum >=10:
-        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, *도전 성공*")
+        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, :star2: *도전 성공*")
     elif dice_sum >=8:
-        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, *일반 성공*")
+        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, :star: *일반 성공*")
     else:
-        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}.")
+        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}. ")
 
         
 @bot.command(name='YN')
 async def yes_or_no(ctx):
-    responses = ["Yes", "No", "Maybe", "Definitely", "Never", "Of course", "Absolutely", "Not a chance", "Sure", "Not likely"]
+    responses = ["YES", "NO", "YUP", "NOPE", "👍", "👎", "⭕️", "❌"]
     response = random.choice(responses)
     await ctx.reply(response)
 
