@@ -55,10 +55,14 @@ async def add_dice(ctx, num1: int = 0, num2: int = 0):
     dice2 = random.randint(1, 6)
     dice_sum = dice1 + dice2 + num1 + num2
     
-    if dice_sum > 8:
-        await ctx.reply(f"🎲 {dice1} , {dice2}. The total is {dice_sum}! 일반 성공!")
+    if dice_sum >= 12:
+        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, *특별 성공*")
+    elif dice_sum >=10:
+        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, *도전 성공*")
+    elif dice_sum >=8:
+        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, *일반 성공*")
     else:
-        await ctx.reply(f"🎲 {dice1} , {dice2}. The total is {dice_sum}!")
+        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}.")
 
         
 @bot.command(name='YN')
