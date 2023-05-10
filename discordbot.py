@@ -57,9 +57,9 @@ async def add_dice(ctx, num1: int = 0, num2: int = 0):
     
     if dice_sum >= 12:
         await ctx.reply(f"🎲 {dice1} , {dice2}. \r 결과는 {dice_sum}, :star2: *특별 성공* :star2:")
-    if dice_sum >=10:
+    elif dice_sum >= 10:
         await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, :star2: *도전 성공*")
-    if dice_sum >=8:
+    elif dice_sum >= 8:
         await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, :star: *일반 성공*")
     else:
         await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}. ")
