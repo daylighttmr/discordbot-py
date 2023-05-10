@@ -1,4 +1,4 @@
-import discord
+mport discord
 from discord.ext import commands
 import os
 import random
@@ -80,13 +80,77 @@ paragraphs = [
     "And finally, a fifth paragraph."
 ]
 
-@bot.command(name='go')
+@bot.command(name='GO')
 async def random_paragraph(ctx):
     random_p = random.choice(paragraphs)
     embed = discord.Embed(title="Random Paragraph", description=random_p)
-    await ctx.reply(embed=embed)
+    await ctx.send(embed=embed)
 
+
+# Register user's worksheet
+@bot.command(name='register')
+async def register_sheet(ctx, sheet_name: str):
+    # Save the sheet name in a dictionary with user ID as the key
+    member_id = ctx.author.id
+    member_sheets[member_id] = sheet_name
+    
+    # Reply to the message with the registration confirmation
+    await ctx.reply(f"Registered sheet '{sheet_name}' for user {ctx.author.name}.")
+
+# Get data from registered sheet for the user who sent the command
+
+@bot.command(name='치료')
+async def get_data_치료(ctx):
+    await retrieve_cell_range(ctx, "AJ27:AK27", "치료")
+
+@bot.command(name='운전')
+async def get_data_운전(ctx):
+    await retrieve_cell_range(ctx, "AJ28:AK28", "운전")
+
+@bot.command(name='손재주')
+async def get_data_손재주(ctx):
+    await retrieve_cell_range(ctx, "AJ26:AK26", "손재주")
+
+async def retrieve_cell_range(ctx, cell_range, command_name):
+    # Retrieve the sheet name for the user
+    member_id = ctx.author.id
+    sheet_name = member_sheets.get(member_id)
+    
+@bot.command(name='getdata')
+async def get_data(ctx, cell: str):
+    # Retrieve the sheet name for the user
+    member_id = ctx.author.id
+    sheet_name = member_sheets.get(member_id)
+    
+    # Check if the user has registered a sheet
+    if sheet_name is None:
+        await ctx.reply("You haven't registered a sheet yet!")
+        return
+    
+    try:
+        # Authenticate with Google Sheets API
+        gc = gspread.authorize(creds)
+        
+        # Open the Google Spreadsheet by ID
+        sheet_id = '1zb5gLeAns7CMUGHlk-4cCC9Tf5V2s4nq_K1Ja7p9U4Y'
+        spreadsheet = gc.open_by_key(sheet_id)
+        
+        # Retrieve the worksheet by name
+        worksheet = spreadsheet.worksheet(sheet_name)
+        
+        # Retrieve the value from the specified cell
+        value = worksheet.acell(cell).value
+        
+        # Reply to the message with the retrieved value
+        await ctx.reply(f"The value in sheet '{sheet_name}' at cell '{cell}' is '{value}'.")
+    
+    except gspread.exceptions.WorksheetNotFound:
+        await ctx.reply(f"Sheet '{sheet_name}' not found in the spreadsheet.")
+    
+    except gspread.exceptions.CellNotFound:
+        await ctx.reply(f"Cell '{cell}' not found in sheet '{sheet_name}'.")
 
 
 # Run the bot
 bot.run(TOKEN)
+
