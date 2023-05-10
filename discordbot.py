@@ -95,7 +95,7 @@ async def register_sheet(ctx, sheet_name: str):
     member_sheets[member_id] = sheet_name
     
     # Reply to the message with the registration confirmation
-    await ctx.reply(f"🌇{ctx.author.name}의 시트 '{sheet_name}' 등록 완료")
+    await ctx.reply(f"🌇 {ctx.author.name}의 시트 '{sheet_name}' 등록 완료")
 
 # Get data from registered sheet for the user who sent the command
 
@@ -172,19 +172,54 @@ async def roll_and_add(ctx):
             dice2 = random.randint(1, 6)
             
             # Retrieve the current value from cell Z28
-            current_value = worksheet.acell('Z28').value
+            cell_value = worksheet.acell('Z28').value
             
             # Convert the current value to an integer and add the dice roll
-            new_value = int(current_value) + dice1 + dice2
-            
-            # Update the value in cell Z28 with the new total
-            worksheet.update('Z28', new_value)
+            sum_value = cell_value + dice1 + dice2
             
             # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}. The new total in cell Z28 is {new_value}.")
+            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 눈치 기술 {cell_value}, 총합 {sum_value}.")
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z28' not found in the worksheet.")
+            
+            
+  # Command to retrieve HP value and optionally add a number to it
+@bot.command(name='HP')
+async def get_and_add_hp(ctx, value: int = None):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Retrieve the current value from cell J22
+            current_value = int(worksheet.acell('J22').value)
+            max_value = int(worksheet.acell('N22').value)
+            
+            if value is None:
+                # If no value is specified, only retrieve and reply with the current value
+                await ctx.reply(f"🌇 현재 체력: {current_value}.")
+            else:
+                # If a value is specified, add it to the current value and update cell J22
+                new_value = current_value + value
+                worksheet.update('J22', new_value)
+                
+                # Determine the message based on the new HP value
+                message = "신체 상태"
+                if current_value >= max_value:
+                    message = "건강함"
+                elif current_value == 1:
+                    message = "빈사: 행동 불능"
+                elif current_value < max_value / 4:
+                    message = "치명상: 행동 페널티"
+                elif 0.5 * max_value < current_value:
+                    message = "경미한 부상"
+                elif current_value >= 2:
+                    message = "심한 부상"
+                
+                await ctx.reply(f"🌇 체력: {current_value} 에서 {new_value} 로 적용. 현재 신체 상태는 {message}")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'J22' or 'N22' not found in the worksheet.")
 
 
 
