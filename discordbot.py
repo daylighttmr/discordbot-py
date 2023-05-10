@@ -160,7 +160,54 @@ async def get_data_운전(ctx):
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'AJ28' not found in the worksheet.")
             
- # Command to roll 2D6 dice and add to cell Z28
+# Command to roll 2D6 dice and add to cell
+@bot.command(name='설득')
+async def roll_and_add(ctx):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell Z28
+            cell_value = int(worksheet.acell('Z26').value)
+            
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 설득 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'Z26' not found in the worksheet.")
+            
+
+
+@bot.command(name='위협')
+async def roll_and_add(ctx):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell Z28
+            cell_value = int(worksheet.acell('Z27').value)
+            
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 위협 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'Z27' not found in the worksheet.")
+            
+            
 @bot.command(name='눈치')
 async def roll_and_add(ctx):
     worksheet = await get_member_worksheet(ctx)
@@ -172,9 +219,9 @@ async def roll_and_add(ctx):
             dice2 = random.randint(1, 6)
             
             # Retrieve the current value from cell Z28
-            cell_value = worksheet.acell('Z28').value
+            cell_value = int(worksheet.acell('Z28').value)
             
-            # Convert the current value to an integer and add the dice roll
+            # Calculate the sum of the dice roll and the cell value
             sum_value = cell_value + dice1 + dice2
             
             # Reply to the message with the dice roll and the updated total
@@ -183,6 +230,124 @@ async def roll_and_add(ctx):
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z28' not found in the worksheet.")
             
+
+@bot.command(name='속임수')
+async def roll_and_add(ctx):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell Z28
+            cell_value = int(worksheet.acell('Z29').value)
+            
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 속임수 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'Z29' not found in the worksheet.")
+            
+            
+# Command to roll 2D6 dice and add to cell Z30
+@bot.command(name='사격')
+async def roll_and_add(ctx):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell Z28
+            cell_value = int(worksheet.acell('Z30').value)
+            
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 사격 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'Z30' not found in the worksheet.")
+            
+            
+# Command to roll 2D6 dice and add to cell Z31
+@bot.command(name='육탄전')
+async def roll_and_add(ctx):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell Z28
+            cell_value = int(worksheet.acell('Z31').value)
+            
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 육탄전 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'Z31' not found in the worksheet.")
+            
+            
+# Command to roll 2D6 dice and add to cell Z32
+@bot.command(name='무브먼트')
+async def roll_and_add(ctx):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell Z28
+            cell_value = int(worksheet.acell('Z32').value)
+            
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 무브먼트 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'Z32' not found in the worksheet.")
+            
+            
+# Command to roll 2D6 dice and add to cell Z33
+@bot.command(name='은신')
+async def roll_and_add(ctx):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell Z28
+            cell_value = int(worksheet.acell('Z33').value)
+            
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 은신 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'Z33' not found in the worksheet.")
             
   # Command to retrieve HP value and optionally add a number to it
 @bot.command(name='HP')
