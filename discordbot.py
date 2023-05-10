@@ -17,9 +17,6 @@ TOKEN = os.getenv('TOKEN')
 # Set up Google Sheets API credentials
 creds = ServiceAccountCredentials.from_json_keyfile_name('daylighttmr-bcd50a44ed0c.json', ['https://www.googleapis.com/auth/spreadsheets'])
 
-# Create dictionary to store member's worksheet names
-member_sheets = {}
-
 # Create bot instance
 bot = commands.Bot(command_prefix=PREFIX)
 
@@ -87,45 +84,28 @@ async def random_paragraph(ctx):
     await ctx.send(embed=embed)
 
 
+# Create dictionary to store member's worksheet names
+member_sheets = {}    
+    
 # Register user's worksheet
-@bot.command(name='register')
+@bot.command(name='등록')
 async def register_sheet(ctx, sheet_name: str):
     # Save the sheet name in a dictionary with user ID as the key
     member_id = ctx.author.id
     member_sheets[member_id] = sheet_name
     
     # Reply to the message with the registration confirmation
-    await ctx.reply(f"Registered sheet '{sheet_name}' for user {ctx.author.name}.")
+    await ctx.reply(f"🌇{ctx.author.name}의 시트 '{sheet_name}' 등록 완료")
 
 # Get data from registered sheet for the user who sent the command
 
-@bot.command(name='치료')
-async def get_data_치료(ctx):
-    await retrieve_cell_range(ctx, "AJ27:AK27", "치료")
-
-@bot.command(name='운전')
-async def get_data_운전(ctx):
-    await retrieve_cell_range(ctx, "AJ28:AK28", "운전")
-
-@bot.command(name='손재주')
-async def get_data_손재주(ctx):
-    await retrieve_cell_range(ctx, "AJ26:AK26", "손재주")
-
-async def retrieve_cell_range(ctx, cell_range, command_name):
-    # Retrieve the sheet name for the user
+async def get_member_worksheet(ctx):
     member_id = ctx.author.id
     sheet_name = member_sheets.get(member_id)
     
-@bot.command(name='getdata')
-async def get_data(ctx, cell: str):
-    # Retrieve the sheet name for the user
-    member_id = ctx.author.id
-    sheet_name = member_sheets.get(member_id)
-    
-    # Check if the user has registered a sheet
     if sheet_name is None:
         await ctx.reply("You haven't registered a sheet yet!")
-        return
+        return None
     
     try:
         # Authenticate with Google Sheets API
@@ -138,17 +118,48 @@ async def get_data(ctx, cell: str):
         # Retrieve the worksheet by name
         worksheet = spreadsheet.worksheet(sheet_name)
         
-        # Retrieve the value from the specified cell
-        value = worksheet.acell(cell).value
-        
-        # Reply to the message with the retrieved value
-        await ctx.reply(f"The value in sheet '{sheet_name}' at cell '{cell}' is '{value}'.")
+        return worksheet
     
     except gspread.exceptions.WorksheetNotFound:
         await ctx.reply(f"Sheet '{sheet_name}' not found in the spreadsheet.")
     
-    except gspread.exceptions.CellNotFound:
-        await ctx.reply(f"Cell '{cell}' not found in sheet '{sheet_name}'.")
+    except Exception as e:
+        await ctx.reply(f"An error occurred: {str(e)}")
+    
+    return None
+
+# Command to retrieve 손재주 value
+@bot.command(name='손재주')
+async def get_data_손재주(ctx):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Retrieve the value from the specified cell
+            cell_value = worksheet.acell('AJ26').value
+            
+            # Reply to the message with the retrieved value
+            await ctx.reply(f"'{worksheet.title}'에서 손재주는 '{cell_value}'.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'AJ26' not found in the worksheet.")
+
+# Command to retrieve 운전 value
+@bot.command(name='운전')
+async def get_data_운전(ctx):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Retrieve the value from the specified cell
+            cell_value = worksheet.acell('AJ28').value
+            
+            # Reply to the message with the retrieved value
+            await ctx.reply(f"'{worksheet.title}'에서 운전은 '{cell_value}'.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'AJ28' not found in the worksheet.")
+
 
 
 # Run the bot
