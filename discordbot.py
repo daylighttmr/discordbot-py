@@ -85,7 +85,7 @@ async def random_paragraph(ctx):
 
 
 # Create dictionary to store member's worksheet names
-member_sheets = {}    
+member_sheets = {와플: 'NPC 닥터 닥터 카마이클-시보마나'}    
     
 # Register user's worksheet
 @bot.command(name='등록')
@@ -205,15 +205,15 @@ async def get_and_add_hp(ctx, value: int = None):
                 
                 # Determine the message based on the new HP value
                 message = "신체 상태"
-                if current_value >= max_value:
+                if new_value >= max_value:
                     message = "건강함"
-                elif current_value == 1:
+                elif new_value == 1:
                     message = "빈사: 행동 불능"
-                elif current_value < max_value / 4:
+                elif new_value < max_value / 4:
                     message = "치명상: 행동 페널티"
-                elif 0.5 * max_value < current_value:
+                elif 0.5 * max_value < new_value:
                     message = "경미한 부상"
-                elif current_value >= 2:
+                elif new_value >= 2:
                     message = "심한 부상"
                 
                 await ctx.reply(f"🌇 체력: {current_value} 에서 {new_value} 로 적용. 현재 신체 상태는 {message}")
