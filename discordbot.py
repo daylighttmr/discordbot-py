@@ -1,4 +1,4 @@
-import discord
+iimport discord
 from discord.ext import commands
 import os
 import random
@@ -23,12 +23,10 @@ def save_member_sheets(member_sheets):
         json.dump(member_sheets, file)
 
 # Load member sheets data on bot startup
-@bot.event
-async def on_ready():
+def setup_bot():
     global member_sheets
     member_sheets = load_member_sheets()
     print(f"Logged in as {bot.user}.")
-
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -44,7 +42,6 @@ creds = ServiceAccountCredentials.from_json_keyfile_name('daylighttmr-bcd50a44ed
 # Create bot instance
 bot = commands.Bot(command_prefix=PREFIX)
 
-
 # Respond to messages
 @bot.event
 async def on_message(message):
@@ -58,6 +55,11 @@ async def on_message(message):
         await message.channel.send('Hello!')
 
     await bot.process_commands(message)
+
+# Load member sheets data after bot is ready
+@bot.event
+async def on_ready():
+    setup_bot()
 
     
 @bot.command(name='1D6')
