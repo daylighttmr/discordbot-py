@@ -86,7 +86,6 @@ async def random_paragraph(ctx):
 
 # Create dictionary to store member's worksheet names
 member_sheets = {}
-    member_sheets[와플] = 'NPC 닥터 카마이클-시보마나'
     
 # Register user's worksheet
 @bot.command(name='등록')
