@@ -4,6 +4,30 @@ import os
 import random
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import json
+
+# File path for storing the member sheets data
+DATA_FILE = "member_sheets.json"
+
+# Load member sheets data from file
+def load_member_sheets():
+    try:
+        with open(DATA_FILE, "r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return {}
+
+# Save member sheets data to file
+def save_member_sheets(member_sheets):
+    with open(DATA_FILE, "w") as file:
+        json.dump(member_sheets, file)
+
+# Load member sheets data on bot startup
+@bot.event
+async def on_ready():
+    global member_sheets
+    member_sheets = load_member_sheets()
+    print(f"Logged in as {bot.user}.")
 
 
 # Load environment variables
@@ -20,10 +44,6 @@ creds = ServiceAccountCredentials.from_json_keyfile_name('daylighttmr-bcd50a44ed
 # Create bot instance
 bot = commands.Bot(command_prefix=PREFIX)
 
-# Print bot information when ready
-@bot.event
-async def on_ready():
-    print(f'Logged in as {bot.user}.')
 
 # Respond to messages
 @bot.event
@@ -84,15 +104,15 @@ async def random_paragraph(ctx):
     await ctx.send(embed=embed)
 
 
-# Create dictionary to store member's worksheet names
-member_sheets = {}
-    
 # Register user's worksheet
 @bot.command(name='등록')
 async def register_sheet(ctx, sheet_name: str):
-    # Save the sheet name in a dictionary with user ID as the key
+    # Save the sheet name in the member_sheets dictionary
     member_id = ctx.author.id
     member_sheets[member_id] = sheet_name
+    
+    # Save the member_sheets dictionary to file
+    save_member_sheets(member_sheets)
     
     # Reply to the message with the registration confirmation
     await ctx.reply(f"🌇 {ctx.author.name}의 시트 '{sheet_name}' 등록 완료")
@@ -178,7 +198,7 @@ async def roll_and_add(ctx):
             sum_value = cell_value + dice1 + dice2
             
             # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 설득 기술 {cell_value}, 총합 {sum_value}.")
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 설득 기술 {cell_value}, 총합 {sum_value}.")
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z26' not found in the worksheet.")
@@ -202,7 +222,7 @@ async def roll_and_add(ctx):
             sum_value = cell_value + dice1 + dice2
             
             # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 위협 기술 {cell_value}, 총합 {sum_value}.")
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 위협 기술 {cell_value}, 총합 {sum_value}.")
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z27' not found in the worksheet.")
@@ -225,7 +245,7 @@ async def roll_and_add(ctx):
             sum_value = cell_value + dice1 + dice2
             
             # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 눈치 기술 {cell_value}, 총합 {sum_value}.")
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 눈치 기술 {cell_value}, 총합 {sum_value}.")
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z28' not found in the worksheet.")
@@ -248,7 +268,7 @@ async def roll_and_add(ctx):
             sum_value = cell_value + dice1 + dice2
             
             # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 속임수 기술 {cell_value}, 총합 {sum_value}.")
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 속임수 기술 {cell_value}, 총합 {sum_value}.")
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z29' not found in the worksheet.")
@@ -272,7 +292,7 @@ async def roll_and_add(ctx):
             sum_value = cell_value + dice1 + dice2
             
             # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 사격 기술 {cell_value}, 총합 {sum_value}.")
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 사격 기술 {cell_value}, 총합 {sum_value}.")
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z30' not found in the worksheet.")
@@ -296,7 +316,7 @@ async def roll_and_add(ctx):
             sum_value = cell_value + dice1 + dice2
             
             # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 육탄전 기술 {cell_value}, 총합 {sum_value}.")
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 육탄전 기술 {cell_value}, 총합 {sum_value}.")
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z31' not found in the worksheet.")
@@ -320,7 +340,7 @@ async def roll_and_add(ctx):
             sum_value = cell_value + dice1 + dice2
             
             # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 무브먼트 기술 {cell_value}, 총합 {sum_value}.")
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 무브먼트 기술 {cell_value}, 총합 {sum_value}.")
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z32' not found in the worksheet.")
@@ -344,7 +364,7 @@ async def roll_and_add(ctx):
             sum_value = cell_value + dice1 + dice2
             
             # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! /r 은신 기술 {cell_value}, 총합 {sum_value}.")
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 은신 기술 {cell_value}, 총합 {sum_value}.")
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z33' not found in the worksheet.")
@@ -362,7 +382,7 @@ async def get_and_add_hp(ctx, value: int = None):
             
             if value is None:
                 # If no value is specified, only retrieve and reply with the current value
-                await ctx.reply(f"🌇 현재 체력: {current_value}.")
+                await ctx.reply(f"🌇 현재 체력: {current_value} / 최대 체력: {max_value}.")
             else:
                 # If a value is specified, add it to the current value and update cell J22
                 new_value = current_value + value
@@ -385,6 +405,7 @@ async def get_and_add_hp(ctx, value: int = None):
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'J22' or 'N22' not found in the worksheet.")
+
 
 
 
