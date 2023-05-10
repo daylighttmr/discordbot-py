@@ -159,6 +159,32 @@ async def get_data_운전(ctx):
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'AJ28' not found in the worksheet.")
+            
+ # Command to roll 2D6 dice and add to cell Z28
+@bot.command(name='눈치')
+async def roll_and_add(ctx):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell Z28
+            current_value = worksheet.acell('Z28').value
+            
+            # Convert the current value to an integer and add the dice roll
+            new_value = int(current_value) + dice1 + dice2
+            
+            # Update the value in cell Z28 with the new total
+            worksheet.update('Z28', new_value)
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}. The new total in cell Z28 is {new_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'Z28' not found in the worksheet.")
 
 
 
