@@ -93,7 +93,7 @@ async def yes_or_no(ctx):
     await ctx.reply(response)
     
     
-    @bot.command(name='WHO')
+@bot.command(name='WHO')
 async def WHO(ctx):
     # Get the list of members in the same channel as the command invoker
     channel = ctx.message.channel
