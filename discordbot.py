@@ -102,7 +102,7 @@ async def WHO(ctx):
     # Filter out the name "데이라이트" if it exists in the member list
     members_without_daylight = [member for member in members if member.name != '데이라이트']
 
-    if members_without_deyelight:
+    if members_without_daylight:
         # Randomly select a member's name from the filtered list
         selected_member = random.choice(members_without_daylight)
         await ctx.reply(f"{selected_member.name}")
