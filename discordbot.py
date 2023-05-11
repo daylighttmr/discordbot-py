@@ -24,21 +24,24 @@ DATA_FILE = "member_sheets.json"
 # Load member sheets data from file
 def load_member_sheets():
     try:
-        with open(DATA_FILE, "r") as file:
-            return json.load(file)
+        with open(DATA_FILE, "r", encoding='UTF-8') as file:
+            json_data = file.read()
+            data_dict = json.loads(json_data)
+            return data_dict
     except FileNotFoundError:
         return {}
 
 # Save member sheets data to file
 def save_member_sheets(member_sheets):
-    with open(DATA_FILE, "w") as file:
-        json.dump(member_sheets, file)
+    with open(DATA_FILE, "w", encoding='UTF-8') as file:
+        json.dump(member_sheets, file, ensure_ascii=False)
 
 # Load member sheets data on bot startup
 def setup_bot():
     global member_sheets
     member_sheets = load_member_sheets()
     print(f"Logged in as {bot.user}.")
+
 
 
 # Respond to messages
@@ -110,11 +113,17 @@ async def random_paragraph(ctx):
 async def register_sheet(ctx, sheet_name: str):
     # Save the sheet name in the member_sheets dictionary
     member_id = ctx.author.id
+    # print('member_id:', member_id)
+    # print('id type:', type(member_id))
+    # print('전체 m.s:', member_sheets)
+    # print('타입:', type(member_sheets))
     member_sheets[member_id] = sheet_name
-    
+    # print('m_s dict 업데이트:', member_sheets[member_id])
+    # print('업데이트 후 m.s:', member_sheets)
+
     # Save the member_sheets dictionary to file
     save_member_sheets(member_sheets)
-    
+    await update_member_worksheet(ctx, member_sheets)
     # Reply to the message with the registration confirmation
     await ctx.reply(f"🌇 {ctx.author.name}의 시트 '{sheet_name}' 등록 완료")
 
@@ -139,6 +148,39 @@ async def get_member_worksheet(ctx):
         # Retrieve the worksheet by name
         worksheet = spreadsheet.worksheet(sheet_name)
         
+        return worksheet
+    
+    except gspread.exceptions.WorksheetNotFound:
+        await ctx.reply(f"Sheet '{sheet_name}' not found in the spreadsheet.")
+    
+    except Exception as e:
+        await ctx.reply(f"An error occurred: {str(e)}")
+    
+    return None
+
+async def update_member_worksheet(ctx, json_data):
+    print('update_member_worksheet start ====>')
+    sheet_name = "JSON"
+    try:
+        # Authenticate with Google Sheets API
+        gc = gspread.authorize(creds)
+        
+        # Open the Google Spreadsheet by ID
+        sheet_id = '1zb5gLeAns7CMUGHlk-4cCC9Tf5V2s4nq_K1Ja7p9U4Y'
+        spreadsheet = gc.open_by_key(sheet_id)
+        
+        # Retrieve the worksheet by name
+        worksheet = spreadsheet.worksheet(sheet_name)
+
+        
+        # 조사 횟수 외의 캐릭터 한 명의 정보 업데이트를 위해 쓰는 메소드
+        try:
+            worksheet.update('A1', str(json_data))
+
+        except Exception as e:
+            print(e)
+            return {'code' : -2, 'action_result_str' : 'reservation 오류. 메세지를 캡쳐 후 총괄에게 문의 바랍니다.' + '\n\n' + str(e)}
+
         return worksheet
     
     except gspread.exceptions.WorksheetNotFound:
