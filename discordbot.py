@@ -5,6 +5,18 @@ import random
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import json
+from dotenv import load_dotenv
+load_dotenv()
+
+# Set command prefix and bot token from environment variables
+PREFIX = os.getenv('PREFIX')
+TOKEN = os.getenv('TOKEN')
+
+# Set up Google Sheets API credentials
+creds = ServiceAccountCredentials.from_json_keyfile_name('daylighttmr-bcd50a44ed0c.json', ['https://www.googleapis.com/auth/spreadsheets'])
+
+# Create bot instance
+bot = commands.Bot(command_prefix=PREFIX)
 
 # File path for storing the member sheets data
 DATA_FILE = "member_sheets.json"
@@ -28,19 +40,6 @@ def setup_bot():
     member_sheets = load_member_sheets()
     print(f"Logged in as {bot.user}.")
 
-# Load environment variables
-from dotenv import load_dotenv
-load_dotenv()
-
-# Set command prefix and bot token from environment variables
-PREFIX = os.getenv('PREFIX')
-TOKEN = os.getenv('TOKEN')
-
-# Set up Google Sheets API credentials
-creds = ServiceAccountCredentials.from_json_keyfile_name('daylighttmr-bcd50a44ed0c.json', ['https://www.googleapis.com/auth/spreadsheets'])
-
-# Create bot instance
-bot = commands.Bot(command_prefix=PREFIX)
 
 # Respond to messages
 @bot.event
