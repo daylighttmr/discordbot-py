@@ -93,22 +93,6 @@ async def yes_or_no(ctx):
     await ctx.reply(response)
     
     
-@bot.command(name='WHO')
-async def WHO(ctx):
-    # Get the list of members in the same channel as the command invoker
-    channel = ctx.message.channel
-    members = channel.members
-
-    # Filter out the name "데이라이트" if it exists in the member list
-    members_without_daylight = [member for member in members if member.name != '데이라이트']
-
-    if members_without_daylight:
-        # Randomly select a member's name from the filtered list
-        selected_member = random.choice(members_without_daylight)
-        await ctx.reply(f"{selected_member.name}")
-    else:
-        await ctx.reply("고를 멤버가 없어요.")
-
 # Random paragraph
 paragraphs = [
     "This is the first paragraph.",
