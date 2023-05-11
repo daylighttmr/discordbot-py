@@ -148,38 +148,6 @@ async def get_member_worksheet(ctx):
         await ctx.reply(f"An error occurred: {str(e)}")
     
     return None
-
-# Command to retrieve 손재주 value
-@bot.command(name='손재주')
-async def get_data_손재주(ctx):
-    worksheet = await get_member_worksheet(ctx)
-    
-    if worksheet is not None:
-        try:
-            # Retrieve the value from the specified cell
-            cell_value = worksheet.acell('AJ26').value
-            
-            # Reply to the message with the retrieved value
-            await ctx.reply(f"'{worksheet.title}'에서 손재주는 '{cell_value}'.")
-        
-        except gspread.exceptions.CellNotFound:
-            await ctx.reply("Cell 'AJ26' not found in the worksheet.")
-
-# Command to retrieve 운전 value
-@bot.command(name='운전')
-async def get_data_운전(ctx):
-    worksheet = await get_member_worksheet(ctx)
-    
-    if worksheet is not None:
-        try:
-            # Retrieve the value from the specified cell
-            cell_value = worksheet.acell('AJ28').value
-            
-            # Reply to the message with the retrieved value
-            await ctx.reply(f"'{worksheet.title}'에서 운전은 '{cell_value}'.")
-        
-        except gspread.exceptions.CellNotFound:
-            await ctx.reply("Cell 'AJ28' not found in the worksheet.")
             
 # Command to roll 2D6 dice and add to cell
 @bot.command(name='설득')
