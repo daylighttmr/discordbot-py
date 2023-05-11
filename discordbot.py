@@ -117,7 +117,7 @@ async def register_sheet(ctx, sheet_name: str):
     # print('id type:', type(member_id))
     # print('전체 m.s:', member_sheets)
     # print('타입:', type(member_sheets))
-    member_sheets[member_id] = sheet_name
+    member_sheets[str(member_id)] = sheet_name
     # print('m_s dict 업데이트:', member_sheets[member_id])
     # print('업데이트 후 m.s:', member_sheets)
 
@@ -131,7 +131,7 @@ async def register_sheet(ctx, sheet_name: str):
 
 async def get_member_worksheet(ctx):
     member_id = ctx.author.id
-    sheet_name = member_sheets.get(member_id)
+    sheet_name = member_sheets.get(str(member_id))
     
     if sheet_name is None:
         await ctx.reply("You haven't registered a sheet yet!")
