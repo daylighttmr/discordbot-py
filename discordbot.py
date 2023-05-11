@@ -229,6 +229,58 @@ async def roll_and_add(ctx):
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z27' not found in the worksheet.")
             
+@bot.command(name='탐색')
+async def feel(ctx, number: int = None):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell AK17
+            cell_value = int(worksheet.acell('AK17').value)
+            
+            if number is not None:
+                # Calculate the sum of the dice roll, cell value, and the mentioned number
+                sum_value = cell_value + dice1 + dice2 + number
+            else:
+                # Calculate the sum of the dice roll and the cell value
+                sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 탐색 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'AK17' not found in the worksheet.")
+
+@bot.command(name='통찰')
+async def think(ctx, number: int = None):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell AK19
+            cell_value = int(worksheet.acell('AK19').value)
+            
+            if number is not None:
+                # Calculate the sum of the dice roll, cell value, and the mentioned number
+                sum_value = cell_value + dice1 + dice2 + number
+            else:
+                # Calculate the sum of the dice roll and the cell value
+                sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 통찰 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'AK19' not found in the worksheet.")
+            
             
 @bot.command(name='눈치')
 async def roll_and_add(ctx):
@@ -407,7 +459,64 @@ async def get_and_add_hp(ctx, value: int = None):
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'J22' or 'N22' not found in the worksheet.")
-
+            
+      #정신력 커맨드
+@bot.command(name='SP')
+async def get_and_add_sp(ctx, value: int = None):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Retrieve the current value from cell J25
+            current_value = int(worksheet.acell('J25').value)
+            max_value = int(worksheet.acell('N25').value)
+            
+            if value is None:
+                # If no value is specified, only retrieve and reply with the current value
+                await ctx.reply(f"🌃 현재 정신력: {current_value} / 최대 정신력: {max_value}.")
+            else:
+                # If a value is specified, add it to the current value and update cell J25
+                new_value = current_value + value
+                worksheet.update('J25', new_value)
+                
+                if current_value < max_value * 0.25:
+                    # If the condition is met, select a random description from the list
+                    descriptions = [
+                        "눈앞이 가리워진 것 같이, 모든 것이 무의미해진다⋯⋯.",
+                        "목을 조르는 것 같은 압박에 휩싸인다.",
+                        "불안의 수렁에 빠진 것 같이, 숨을 쉴 수 없다.",
+                        "한계에 도달했다. 남은 것은 폐허와 파괴 뿐이다⋯⋯."
+                    ]
+                    embed_description = random.choice(descriptions)
+                    
+                    embed_title = "극도의 스트레스 상태!"
+                    
+                    # Append the common description
+                    embed_description += "\n정신이 무너집니다. 스스로를, 혹은 타인을 망가뜨리지 않으면 견딜 수 없을 정도로. \r  💡 YN 명령어로, ⭕️: 자해 / ❌: 상해를 고릅니다. 운에 맡기지 않고 스스로 선택할 수도 있습니다."
+                
+                elif current_value <= max_value * 0.5:
+                    embed_title = "스트레스 반응 발동!"
+                    embed_description = random.choice([
+                        "뭔가가 잘못됐다.",
+                        "이게 아니야, 이런 게 아니야⋯⋯.",
+                        "내면에서 뭔가가 망가져 간다."
+                    ])
+                    
+                    # Append the common description and the text from cells F31 and F32
+                    text1 = worksheet.acell('F31').value
+                    text2 = worksheet.acell('F32').value
+                    embed_description += f"\n스트레스 반응,💡 YN 명령어로, ⭕️: {text1} / ❌: {text2} 중에서 고릅니다. 운에 맡기지 않고 스스로 선택할 수도 있습니다. 이 상태는 정신력을 회복할 때까지 계속됩니다."
+                
+                else:
+                    await ctx.reply(f"🌃 정신력, {current_value}에서 {new_value}로 적용.")
+                    return
+                
+                # Create and send the embed message
+                embed = discord.Embed(title=embed_title, description=embed_description)
+                await ctx.send(embed=embed)
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("One or more cells not found in the worksheet.")
 
 
 
