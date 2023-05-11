@@ -479,7 +479,7 @@ async def get_and_add_sp(ctx, value: int = None):
                 new_value = current_value + value
                 worksheet.update('J25', new_value)
                 
-                if current_value < max_value * 0.25:
+                if new_value < max_value * 0.25:
                     # If the condition is met, select a random description from the list
                     descriptions = [
                         "눈앞이 가리워진 것 같이, 모든 것이 무의미해진다⋯⋯.",
@@ -492,9 +492,9 @@ async def get_and_add_sp(ctx, value: int = None):
                     embed_title = "극도의 스트레스 상태!"
                     
                     # Append the common description
-                    embed_description += "\n정신이 무너집니다. 스스로를, 혹은 타인을 망가뜨리지 않으면 견딜 수 없을 정도로. \r  💡 YN 명령어로, ⭕️: 자해 / ❌: 상해를 고릅니다. 운에 맡기지 않고 스스로 선택할 수도 있습니다."
+                    embed_description += "\n정신이 무너집니다. 스스로를, 혹은 타인을 망가뜨리지 않으면 견딜 수 없을 정도로. \r  💡 현재 정신력 {new_value}, YN 명령어로, ⭕️: 자해 / ❌: 상해를 고릅니다. 운에 맡기지 않고 스스로 선택할 수도 있습니다."
                 
-                elif current_value <= max_value * 0.5:
+                elif new_value <= max_value * 0.5:
                     embed_title = "스트레스 반응 발동!"
                     embed_description = random.choice([
                         "뭔가가 잘못됐다.",
@@ -505,7 +505,7 @@ async def get_and_add_sp(ctx, value: int = None):
                     # Append the common description and the text from cells F31 and F32
                     text1 = worksheet.acell('F31').value
                     text2 = worksheet.acell('F32').value
-                    embed_description += f"\n스트레스 반응,💡 YN 명령어로, ⭕️: {text1} / ❌: {text2} 중에서 고릅니다. 운에 맡기지 않고 스스로 선택할 수도 있습니다. 이 상태는 정신력을 회복할 때까지 계속됩니다."
+                    embed_description += f"\n스트레스 반응 발동,💡 현재 정신력 {new_value}, YN 명령어로, ⭕️: {text1} / ❌: {text2} 중에서 고릅니다. 운에 맡기지 않고 스스로 선택할 수도 있습니다. 이 상태는 정신력을 회복할 때까지 계속됩니다."
                 
                 else:
                     await ctx.reply(f"🌃 정신력, {current_value}에서 {new_value}로 적용.")
