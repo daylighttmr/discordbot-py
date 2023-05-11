@@ -158,7 +158,7 @@ async def get_member_worksheet(ctx):
     
     return None
 
-async def update_member_worksheet(ctx, json_data):
+async def update_member_worksheet(ctx, member_sheets):
     print('update_member_worksheet start ====>')
     sheet_name = "JSON"
     try:
@@ -170,12 +170,12 @@ async def update_member_worksheet(ctx, json_data):
         spreadsheet = gc.open_by_key(sheet_id)
         
         # Retrieve the worksheet by name
+        
         worksheet = spreadsheet.worksheet(sheet_name)
 
-        
-        # 조사 횟수 외의 캐릭터 한 명의 정보 업데이트를 위해 쓰는 메소드
+    
         try:
-            worksheet.update('A1', str(json_data))
+            worksheet.update('A1', str(member_sheets))
 
         except Exception as e:
             print(e)
