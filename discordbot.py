@@ -134,7 +134,7 @@ async def get_member_worksheet(ctx):
     sheet_name = member_sheets.get(str(member_id))
     
     if sheet_name is None:
-        await ctx.reply("You haven't registered a sheet yet!")
+        await ctx.reply("😵 시트를 등록해주세요.")
         return None
     
     try:
@@ -432,6 +432,142 @@ async def roll_and_add(ctx):
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z33' not found in the worksheet.")
             
+                        
+@bot.command(name='손재주')
+async def craft(ctx, number: int = None):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell AJ26
+            cell_value = int(worksheet.acell('AJ26').value)
+            
+            if number is not None:
+                # Calculate the sum of the dice roll, cell value, and the mentioned number
+                sum_value = cell_value + dice1 + dice2 + number
+            else:
+                # Calculate the sum of the dice roll and the cell value
+                sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 손재주 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'AJ26' not found in the worksheet.")
+            
+            
+@bot.command(name='치료')
+async def heal(ctx, number: int = None):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell AJ27
+            cell_value = int(worksheet.acell('AJ27').value)
+            
+            if number is not None:
+                # Calculate the sum of the dice roll, cell value, and the mentioned number
+                sum_value = cell_value + dice1 + dice2 + number
+            else:
+                # Calculate the sum of the dice roll and the cell value
+                sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 치료 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'AJ27' not found in the worksheet.")
+            
+
+@bot.command(name='운전')
+async def drive(ctx, number: int = None):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell AJ28
+            cell_value = int(worksheet.acell('AJ28').value)
+            
+            if number is not None:
+                # Calculate the sum of the dice roll, cell value, and the mentioned number
+                sum_value = cell_value + dice1 + dice2 + number
+            else:
+                # Calculate the sum of the dice roll and the cell value
+                sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 운전 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'AJ28' not found in the worksheet.")
+            
+            
+@bot.command(name='요리')
+async def cook(ctx, number: int = None):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell AJ29
+            cell_value = int(worksheet.acell('AJ29').value)
+            
+            if number is not None:
+                # Calculate the sum of the dice roll, cell value, and the mentioned number
+                sum_value = cell_value + dice1 + dice2 + number
+            else:
+                # Calculate the sum of the dice roll and the cell value
+                sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 요리 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'AJ29' not found in the worksheet.")
+            
+
+@bot.command(name='기계')
+async def machina(ctx, number: int = None):
+    worksheet = await get_member_worksheet(ctx)
+    
+    if worksheet is not None:
+        try:
+            # Roll two six-sided dice
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            
+            # Retrieve the current value from cell AJ30
+            cell_value = int(worksheet.acell('AJ30').value)
+            
+            if number is not None:
+                # Calculate the sum of the dice roll, cell value, and the mentioned number
+                sum_value = cell_value + dice1 + dice2 + number
+            else:
+                # Calculate the sum of the dice roll and the cell value
+                sum_value = cell_value + dice1 + dice2
+            
+            # Reply to the message with the dice roll and the updated total
+            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 기계 기술 {cell_value}, 총합 {sum_value}.")
+        
+        except gspread.exceptions.CellNotFound:
+            await ctx.reply("Cell 'AJ30' not found in the worksheet.")
+            
+            
   # Command to retrieve HP value and optionally add a number to it
 @bot.command(name='HP')
 async def get_and_add_hp(ctx, value: int = None):
@@ -501,7 +637,7 @@ async def get_and_add_sp(ctx, value: int = None):
                     embed_title = "극도의 스트레스 상태!"
                     
                     # Append the common description
-                    embed_description += "\n정신이 무너집니다. 스스로를, 혹은 타인을 망가뜨리지 않으면 견딜 수 없을 정도로. \r  💡 현재 정신력 {new_value}, YN 명령어로, ⭕️: 자해 / ❌: 상해를 고릅니다. 운에 맡기지 않고 스스로 선택할 수도 있습니다."
+                    embed_description += "\n정신이 무너집니다. 스스로를, 혹은 타인을 망가뜨리지 않으면 견딜 수 없을 정도로. \r  💡 YN 명령어로, ⭕️: 자해 / ❌: 상해를 고릅니다. 운에 맡기지 않고 스스로 선택할 수도 있습니다."
                 
                 elif new_value <= max_value * 0.5:
                     embed_title = "스트레스 반응 발동!"
@@ -511,10 +647,10 @@ async def get_and_add_sp(ctx, value: int = None):
                         "내면에서 뭔가가 망가져 간다."
                     ])
                     
-                    # Append the common description and the text from cells F31 and F32
-                    text1 = worksheet.acell('F31').value
-                    text2 = worksheet.acell('F32').value
-                    embed_description += f"\n스트레스 반응 발동,💡 현재 정신력 {new_value}, YN 명령어로, ⭕️: {text1} / ❌: {text2} 중에서 고릅니다. 운에 맡기지 않고 스스로 선택할 수도 있습니다. 이 상태는 정신력을 회복할 때까지 계속됩니다."
+                    # Append the common description and the text from cells F30 and F31
+                    text1 = worksheet.acell('F30').value
+                    text2 = worksheet.acell('F31').value
+                    embed_description += f"\n💡 현재 정신력 {new_value}, 스트레스 반응 발동.\r YN 명령어로, ⭕️: {text1} / ❌: {text2} 중에서 고릅니다. 운에 맡기지 않고 스스로 선택할 수도 있습니다. 이 상태는 정신력을 회복할 때까지 계속됩니다."
                 
                 else:
                     await ctx.reply(f"🌃 정신력, {current_value}에서 {new_value}로 적용.")
@@ -522,7 +658,7 @@ async def get_and_add_sp(ctx, value: int = None):
                 
                 # Create and send the embed message
                 embed = discord.Embed(title=embed_title, description=embed_description)
-                await ctx.send(embed=embed)
+                await ctx.reply(embed=embed)
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("One or more cells not found in the worksheet.")
