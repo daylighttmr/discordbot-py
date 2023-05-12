@@ -92,6 +92,18 @@ async def yes_or_no(ctx):
     response = random.choice(responses)
     await ctx.reply(response)
     
+    @bot.command(name='AWHO')
+async def awho(ctx):
+    anames = ["포모나 머피". "그라시아 블랑코", "닉 켄드릭", "데이빗", "에이버리 윌리엄스", "베네 산드루", "레베카", "베티 웰즈", "네이선 퍼소프", "로버트 '롭' 글렌", "스테파니 루비오", "함영선 데오도라", "필립 웰랜드", "로미오 피아프", "니키 빅"]
+    callname = random.choice(anames)
+    await ctx.reply(callname)
+    
+        @bot.command(name='BWHO')
+async def bwho(ctx):
+    bnames = ["케일럼 반 웨스턴", "데이비드 조니 바니스터", "리코 버호벤", "크리스 가데니아", "헤벨 로헬", "밀러 제이", "로저 하워드", "올리버 윈스턴", "가브리엘 코스타", "이노스 마셜", "빌리 깁스", "벤자민 위버", "알마 던스트", "크레이그 켈먼", "다니엘 포터필드", "오스틴 박"]
+    namecall = random.choice(bnames)
+    await ctx.reply(namecall)
+    
     
 # Random paragraph
 paragraphs = [
