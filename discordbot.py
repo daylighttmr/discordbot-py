@@ -46,20 +46,36 @@ def setup_bot():
 
 # 230517 JAMONG - 추가 인자 연산 기능 추가
 def add_cal(additional_arg):
-    matches = re.findall(r'[+-]?\d+', additional_arg)
-    nums = [int(match) for match in matches]
+    add_list = []
+    tmp_flag = False
+    start_i = ''
+    end_i = ''
+    for i in range(len(additional_arg)):
+        print(i, additional_arg[i])
+        if tmp_flag==False:
+            if additional_arg[i] == '+':
+                tmp_flag = True
+                start_i = i
+            elif additional_arg[i] == '-':
+                tmp_flag = True
+                start_i = i
+        elif tmp_flag == True:
+            if additional_arg[i] in ['+', '-']:
+                if start_i + 1 == i:
+                    print('연산자 두개가 동시에 나오는 에러')
+                    return 0
+                else:
+                    end_i = i
 
-    # 초기값 설정
-    result = nums[0]
+        if (start_i != '' and end_i != '') or (start_i != '' and i+1 == len(additional_arg)):
+            if end_i == '':
+                end_i = None
+            
 
-    # 숫자와 연산자 반복적으로 처리하여 계산
-    for i in range(1, len(nums)):
-        operator = additional_arg[additional_arg.index(matches[i-1]) + len(matches[i-1])]
-        if operator == '+':
-            result += nums[i]
-        elif operator == '-':
-            result -= nums[i]
-    return result
+            add_list.append(int(additional_arg[start_i:end_i]))
+            start_i = i
+            end_i = ''
+    return sum(add_list)
 
 def success_level(dice):
     if dice >= 12:
@@ -72,12 +88,13 @@ def success_level(dice):
         return "."
 
 # 230517 JAMONG - 커맨드 리스트 정리 
-commands_list = ['1D6', '2D6', 'YN', 'AWHO', 'BWHO', 'WHO', 'NIGHT', '등록', '설득', '위협', '탐색', '통찰', '눈치', '속임수', '사격', '육탄전', '무브먼트', '은신', '손재주', '치료', '운전', '요리', '기계', 'HP', 'SP']
+# commands_list = ['!1D6', '!2D6', '!YN', '!AWHO', '!BWHO', '!WHO', '!NIGHT', '!등록', '!설득', '!위협', '!탐색', '통찰', '눈치', '속임수', '사격', '육탄전', '무브먼트', '은신', '손재주', '치료', '운전', '요리', '기계', 'HP', 'SP']
 # startswith_commans_list = ['설득', '위협', '탐색', '통찰', '눈치', '속임수', '사격', '육탄전', '무브먼트', '은신', '손재주', '치료', '운전', '요리', '기계']
 
 # Respond to messages
 @bot.event
 async def on_message(message):
+    print('message.content:', message.content)
     if message.author == bot.user:
         return
 
@@ -88,13 +105,13 @@ async def on_message(message):
         await message.channel.send('Hello!')
 
     # 230517 JAMONG - 스레드 메세지에도 응답하도록 수정
-    if message.content in commands_list:
-        if isinstance(message.channel, discord.Thread):  # 스레드 응답
-            await bot.process_commands(message) 
-        else:
-            await bot.process_commands(message)  # 명령어를 처리하기 위해 process_commands를 호출합니다.
+    # if message.content in commands_list:
+    #     if isinstance(message.channel, discord.ThreadChannel):  # 스레드 응답
+    #         await bot.process_commands(message) 
+    #     else:
+    #         await bot.process_commands(message)  # 명령어를 처리하기 위해 process_commands를 호출합니다.
 
-    # await bot.process_commands(message)
+    await bot.process_commands(message)
 
 
 
@@ -199,6 +216,7 @@ async def register_sheet(ctx, sheet_name: str):
 # Get data from registered sheet for the user who sent the command
 
 async def get_member_worksheet(ctx):
+    print("시트 불러오는 중")
     member_id = ctx.author.id
     sheet_name = member_sheets.get(str(member_id))
     
@@ -263,6 +281,7 @@ async def update_member_worksheet(ctx, member_sheets):
 # Command to roll 2D6 dice and add to cell
 @bot.command(name='설득')
 async def roll_and_add(ctx, additional_args:str=None):
+    print('설득')
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
