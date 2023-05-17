@@ -128,6 +128,11 @@ async def random_paragraph(ctx):
     random_p = random.choice(paragraphs)
     embed = discord.Embed(title=random_p["title"], description=random_p["content"], color=discord.Color.green())
     await ctx.reply(embed=embed)
+    
+    # Update the value in cell J22 
+    current_value = int(worksheet.acell('J22').value)
+    new_value = current_value - 2
+    worksheet.update('J22', new_value)
 
 
 # Register user's worksheet
