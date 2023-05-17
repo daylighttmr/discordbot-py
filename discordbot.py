@@ -7,6 +7,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import json
 from dotenv import load_dotenv
 load_dotenv()
+import re
 
 # Set command prefix and bot token from environment variables
 PREFIX = os.getenv('PREFIX')
@@ -43,6 +44,36 @@ def setup_bot():
     print(f"Logged in as {bot.user}.")
 
 
+# 230517 JAMONG - 추가 인자 연산 기능 추가
+def add_cal(additional_arg):
+    matches = re.findall(r'[+-]?\d+', additional_arg)
+    nums = [int(match) for match in matches]
+
+    # 초기값 설정
+    result = nums[0]
+
+    # 숫자와 연산자 반복적으로 처리하여 계산
+    for i in range(1, len(nums)):
+        operator = additional_arg[additional_arg.index(matches[i-1]) + len(matches[i-1])]
+        if operator == '+':
+            result += nums[i]
+        elif operator == '-':
+            result -= nums[i]
+    return result
+
+def success_level(dice):
+    if dice >= 12:
+        return ", :star2: *특별 성공*"
+    elif dice >= 10:
+        return ", :star2: *도전 성공*"
+    elif dice >= 8:
+        return ", :star: *일반 성공*"
+    else:
+        return "."
+
+# 230517 JAMONG - 커맨드 리스트 정리 
+commands_list = ['1D6', '2D6', 'YN', 'AWHO', 'BWHO', 'WHO', 'NIGHT', '등록', '설득', '위협', '탐색', '통찰', '눈치', '속임수', '사격', '육탄전', '무브먼트', '은신', '손재주', '치료', '운전', '요리', '기계', 'HP', 'SP']
+# startswith_commans_list = ['설득', '위협', '탐색', '통찰', '눈치', '속임수', '사격', '육탄전', '무브먼트', '은신', '손재주', '치료', '운전', '요리', '기계']
 
 # Respond to messages
 @bot.event
@@ -56,7 +87,16 @@ async def on_message(message):
     if message.content.startswith(f'{PREFIX}hello'):
         await message.channel.send('Hello!')
 
-    await bot.process_commands(message)
+    # 230517 JAMONG - 스레드 메세지에도 응답하도록 수정
+    if message.content in commands_list:
+        if isinstance(message.channel, discord.Thread):  # 스레드 응답
+            await bot.process_commands(message) 
+        else:
+            await bot.process_commands(message)  # 명령어를 처리하기 위해 process_commands를 호출합니다.
+
+    # await bot.process_commands(message)
+
+
 
 # Load member sheets data after bot is ready
 @bot.event
@@ -84,6 +124,8 @@ async def add_dice(ctx, num1: int = 0, num2: int = 0):
         await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, :star: *일반 성공*")
     else:
         await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}. ")
+
+        
 
         
 @bot.command(name='YN')
@@ -125,15 +167,15 @@ paragraphs = [
 
 @bot.command(name='NIGHT')
 async def random_paragraph(ctx):
+    worksheet = await get_member_worksheet(ctx)
     random_p = random.choice(paragraphs)
     embed = discord.Embed(title=random_p["title"], description=random_p["content"], color=discord.Color.green())
     await ctx.reply(embed=embed)
-    
+
     # Update the value in cell J22 
     current_value = int(worksheet.acell('J22').value)
     new_value = current_value - 2
     worksheet.update('J22', new_value)
-
 
 # Register user's worksheet
 @bot.command(name='등록')
@@ -220,7 +262,7 @@ async def update_member_worksheet(ctx, member_sheets):
             
 # Command to roll 2D6 dice and add to cell
 @bot.command(name='설득')
-async def roll_and_add(ctx):
+async def roll_and_add(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -234,9 +276,15 @@ async def roll_and_add(ctx):
             
             # Calculate the sum of the dice roll and the cell value
             sum_value = cell_value + dice1 + dice2
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+            
             
             # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 설득 기술 {cell_value}, 총합 {sum_value}.")
+            reply_content = f"🎲 {dice1}, {dice2}! \r 설득 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z26' not found in the worksheet.")
@@ -244,7 +292,7 @@ async def roll_and_add(ctx):
 
 
 @bot.command(name='위협')
-async def roll_and_add(ctx):
+async def roll_and_add(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -259,14 +307,20 @@ async def roll_and_add(ctx):
             # Calculate the sum of the dice roll and the cell value
             sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 위협 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+
+            reply_content = f"🎲 {dice1}, {dice2}! \r 위협 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z27' not found in the worksheet.")
             
 @bot.command(name='탐색')
-async def feel(ctx, number: int = None):
+async def feel(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -277,22 +331,24 @@ async def feel(ctx, number: int = None):
             
             # Retrieve the current value from cell AK17
             cell_value = int(worksheet.acell('AK17').value)
+           
+           
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
             
-            if number is not None:
-                # Calculate the sum of the dice roll, cell value, and the mentioned number
-                sum_value = cell_value + dice1 + dice2 + number
-            else:
-                # Calculate the sum of the dice roll and the cell value
-                sum_value = cell_value + dice1 + dice2
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            reply_content = f"🎲 {dice1}, {dice2}! \r 탐색 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 탐색 {cell_value}, 총합 {sum_value}.")
-        
+            await ctx.reply(reply_content)
+            
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'AK17' not found in the worksheet.")
 
 @bot.command(name='통찰')
-async def think(ctx, number: int = None):
+async def think(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -304,22 +360,23 @@ async def think(ctx, number: int = None):
             # Retrieve the current value from cell AK19
             cell_value = int(worksheet.acell('AK19').value)
             
-            if number is not None:
-                # Calculate the sum of the dice roll, cell value, and the mentioned number
-                sum_value = cell_value + dice1 + dice2 + number
-            else:
-                # Calculate the sum of the dice roll and the cell value
-                sum_value = cell_value + dice1 + dice2
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 통찰 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            reply_content = f"🎲 {dice1}, {dice2}! \r 통찰 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'AK19' not found in the worksheet.")
             
             
-@bot.command(name='눈치')
-async def roll_and_add(ctx):
+@bot.command(name='눈치', )
+async def roll_and_add(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -334,15 +391,20 @@ async def roll_and_add(ctx):
             # Calculate the sum of the dice roll and the cell value
             sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 눈치 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            reply_content = f"🎲 {dice1}, {dice2}! \r 눈치 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z28' not found in the worksheet.")
             
 
 @bot.command(name='속임수')
-async def roll_and_add(ctx):
+async def roll_and_add(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -357,8 +419,14 @@ async def roll_and_add(ctx):
             # Calculate the sum of the dice roll and the cell value
             sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 속임수 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            reply_content = f"🎲 {dice1}, {dice2}! \r 속임수 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
+
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z29' not found in the worksheet.")
@@ -366,7 +434,7 @@ async def roll_and_add(ctx):
             
 # Command to roll 2D6 dice and add to cell Z30
 @bot.command(name='사격')
-async def roll_and_add(ctx):
+async def roll_and_add(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -378,11 +446,18 @@ async def roll_and_add(ctx):
             # Retrieve the current value from cell Z28
             cell_value = int(worksheet.acell('Z30').value)
             
-            # Calculate the sum of the dice roll and the cell value
+           # Calculate the sum of the dice roll and the cell value
             sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 사격 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            
+            reply_content = f"🎲 {dice1}, {dice2}! \r 사격 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
+
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z30' not found in the worksheet.")
@@ -390,7 +465,7 @@ async def roll_and_add(ctx):
             
 # Command to roll 2D6 dice and add to cell Z31
 @bot.command(name='육탄전')
-async def roll_and_add(ctx):
+async def roll_and_add(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -405,8 +480,15 @@ async def roll_and_add(ctx):
             # Calculate the sum of the dice roll and the cell value
             sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 육탄전 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            
+            reply_content = f"🎲 {dice1}, {dice2}! \r 육탄전 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
+
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z31' not found in the worksheet.")
@@ -414,7 +496,7 @@ async def roll_and_add(ctx):
             
 # Command to roll 2D6 dice and add to cell Z32
 @bot.command(name='무브먼트')
-async def roll_and_add(ctx):
+async def roll_and_add(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -429,8 +511,14 @@ async def roll_and_add(ctx):
             # Calculate the sum of the dice roll and the cell value
             sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 무브먼트 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            reply_content = f"🎲 {dice1}, {dice2}! \r 무브먼트 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
+
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z32' not found in the worksheet.")
@@ -438,7 +526,7 @@ async def roll_and_add(ctx):
             
 # Command to roll 2D6 dice and add to cell Z33
 @bot.command(name='은신')
-async def roll_and_add(ctx):
+async def roll_and_add(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -453,15 +541,21 @@ async def roll_and_add(ctx):
             # Calculate the sum of the dice roll and the cell value
             sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 은신 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            reply_content = f"🎲 {dice1}, {dice2}! \r 은신 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
+
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'Z33' not found in the worksheet.")
             
                         
 @bot.command(name='손재주')
-async def craft(ctx, number: int = None):
+async def craft(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -473,22 +567,24 @@ async def craft(ctx, number: int = None):
             # Retrieve the current value from cell AJ26
             cell_value = int(worksheet.acell('AJ26').value)
             
-            if number is not None:
-                # Calculate the sum of the dice roll, cell value, and the mentioned number
-                sum_value = cell_value + dice1 + dice2 + number
-            else:
-                # Calculate the sum of the dice roll and the cell value
-                sum_value = cell_value + dice1 + dice2
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 손재주 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            reply_content = f"🎲 {dice1}, {dice2}! \r 손재주 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
+
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'AJ26' not found in the worksheet.")
             
             
 @bot.command(name='치료')
-async def heal(ctx, number: int = None):
+async def heal(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -500,22 +596,24 @@ async def heal(ctx, number: int = None):
             # Retrieve the current value from cell AJ27
             cell_value = int(worksheet.acell('AJ27').value)
             
-            if number is not None:
-                # Calculate the sum of the dice roll, cell value, and the mentioned number
-                sum_value = cell_value + dice1 + dice2 + number
-            else:
-                # Calculate the sum of the dice roll and the cell value
-                sum_value = cell_value + dice1 + dice2
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 치료 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            reply_content = f"🎲 {dice1}, {dice2}! \r 치료 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
+
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'AJ27' not found in the worksheet.")
             
 
 @bot.command(name='운전')
-async def drive(ctx, number: int = None):
+async def drive(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -527,22 +625,24 @@ async def drive(ctx, number: int = None):
             # Retrieve the current value from cell AJ28
             cell_value = int(worksheet.acell('AJ28').value)
             
-            if number is not None:
-                # Calculate the sum of the dice roll, cell value, and the mentioned number
-                sum_value = cell_value + dice1 + dice2 + number
-            else:
-                # Calculate the sum of the dice roll and the cell value
-                sum_value = cell_value + dice1 + dice2
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 운전 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            
+            reply_content = f"🎲 {dice1}, {dice2}! \r 운전 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'AJ28' not found in the worksheet.")
             
             
 @bot.command(name='요리')
-async def cook(ctx, number: int = None):
+async def cook(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -554,22 +654,24 @@ async def cook(ctx, number: int = None):
             # Retrieve the current value from cell AJ29
             cell_value = int(worksheet.acell('AJ29').value)
             
-            if number is not None:
-                # Calculate the sum of the dice roll, cell value, and the mentioned number
-                sum_value = cell_value + dice1 + dice2 + number
-            else:
-                # Calculate the sum of the dice roll and the cell value
-                sum_value = cell_value + dice1 + dice2
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 요리 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            
+            reply_content = f"🎲 {dice1}, {dice2}! \r 요리 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'AJ29' not found in the worksheet.")
             
 
 @bot.command(name='기계')
-async def machina(ctx, number: int = None):
+async def machina(ctx, additional_args:str=None):
     worksheet = await get_member_worksheet(ctx)
     
     if worksheet is not None:
@@ -581,15 +683,17 @@ async def machina(ctx, number: int = None):
             # Retrieve the current value from cell AJ30
             cell_value = int(worksheet.acell('AJ30').value)
             
-            if number is not None:
-                # Calculate the sum of the dice roll, cell value, and the mentioned number
-                sum_value = cell_value + dice1 + dice2 + number
-            else:
-                # Calculate the sum of the dice roll and the cell value
-                sum_value = cell_value + dice1 + dice2
+            # Calculate the sum of the dice roll and the cell value
+            sum_value = cell_value + dice1 + dice2
             
-            # Reply to the message with the dice roll and the updated total
-            await ctx.reply(f"🎲 {dice1}, {dice2}! \r 기계 기술 {cell_value}, 총합 {sum_value}.")
+            if additional_args != None:
+                sum_value += add_cal(additional_args)
+
+            
+            reply_content = f"🎲 {dice1}, {dice2}! \r 기계 기술 {cell_value}, 총합 {sum_value}"
+            reply_content += success_level(sum_value)
+            
+            await ctx.reply(reply_content)
         
         except gspread.exceptions.CellNotFound:
             await ctx.reply("Cell 'AJ30' not found in the worksheet.")
