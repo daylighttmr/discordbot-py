@@ -121,27 +121,27 @@ async def on_ready():
     setup_bot()
 
     
+    
 @bot.command(name='1D6')
-async def roll_dice(ctx):
-    dice_roll = random.randint(1, 6)
-    await ctx.reply(f"🎲 {dice_roll}!")
+async def roll_dice(ctx, additional_args:str=None):
+    sum_value = random.randint(1, 6)
+
+    if additional_args != None:
+        sum_value += add_cal(additional_args)
+            
+    await ctx.reply(f"🎲 {sum_value}!")
     
     
 @bot.command(name='2D6')
-async def add_dice(ctx, num1: int = 0, num2: int = 0):
+async def add_dice(ctx, additional_args:str=None):
     dice1 = random.randint(1, 6)
     dice2 = random.randint(1, 6)
-    dice_sum = dice1 + dice2 + num1 + num2
+    sum_value = dice1 + dice2
     
-    if dice_sum >= 12:
-        await ctx.reply(f"🎲 {dice1} , {dice2}. \r 결과는 {dice_sum}, :star2: *특별 성공* :star2:")
-    elif dice_sum >= 10:
-        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, :star2: *도전 성공*")
-    elif dice_sum >= 8:
-        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}, :star: *일반 성공*")
-    else:
-        await ctx.reply(f"🎲 {dice1} , {dice2}. 결과는 {dice_sum}. ")
+    if additional_args != None:
+        sum_value += add_cal(additional_args)
 
+    await ctx.reply(f"🎲 {sum_value}!")
         
 
         
