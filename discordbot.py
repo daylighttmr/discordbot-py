@@ -815,6 +815,27 @@ async def get_and_add_sp(ctx, value: int = None):
             await ctx.reply("One or more cells not found in the worksheet.")
 
 
+@bot.command(name='진저')
+spreadsheet_key = '1YPLukJ83WPreM2vZqBQ_9S-NcSelQnpDgDAYSXLARa0' 
+worksheet_name = 'hospital' 
+worksheet = gc.open_by_key(spreadsheet_key).worksheet(worksheet_name)
+async def increment_cell_value(ctx, n: int):
+    cell = worksheet.acell('B1')
+    current_value = int(cell.value)
+    new_value = current_value + n
+    cell.value = new_value
+    worksheet.update_cell(cell.row, cell.col, new_value)
+    await ctx.send(f"남은 체력: {new_value}")
+
+@bot.command(name='귀')
+async def increment_cell_value(ctx, n: int):
+    cell = worksheet.acell('B2')
+    current_value = int(cell.value)
+    new_value = current_value + n
+    cell.value = new_value
+    worksheet.update_cell(cell.row, cell.col, new_value)
+    await ctx.send(f"남은 체력: {new_value}")
+
 
 # Run the bot
 bot.run(TOKEN)
