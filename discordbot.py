@@ -206,6 +206,24 @@ async def 가브리엘(ctx):
     random_gav = random.choice(gavlines)
     await ctx.reply(random_gav)
     
+filines = [
+    "쉘—터가 싫다고? 아니! 으흐흐흐... 아니! 난 그냥 여기가 망가지는 모습을 보기가 싫었을 뿐이야!",
+    "그—래. 뉴 산타 바바라... 흐흐흐. 여기에 잠시 머물게 될 줄 몰랐어. 바다가 트인... 거쳐—집을 갖게 될 거라곤 상상도 못했고.",
+    "즐기는 게 최고라고. 사랑하는 걸 즐기고— 시대의 반항아처럼!",
+    "염병 네가 진짜 엄마냐? 아니면—좀 자식한테 관심 많은 아빠?",
+    "난—그냥. 삶을 즐기는 게 자유가 아닐까 해. 친구.",
+    "좋아— 이 지루한 틈에 내가 노래를 불러주지. I know— I know I know, i know I know⋯ (I Don't To Push It 中)",
+    "오, 세상에. 지금 내가 골든 햄스터? 으흐흐. 찍찍. 받아주세요.",
+    "으흐흐—내가 맞춰보지. 난⋯네 번째가 될 거야. 세 번짼 너무 적고, 다섯 번짼 너무 많으니까.",
+    "내가 그립긴 했구나!",
+    "난 * 이제부터* 약을 끊겠어. 이러다 진짜 뒤질—거야. 흐흐흐..."
+]
+
+@bot.command(name='파이')
+async def 파이(ctx):
+    random_fi = random.choice(filines)
+    await ctx.reply(random_fi)
+    
     
 # Random paragraph
 paragraphs = [
