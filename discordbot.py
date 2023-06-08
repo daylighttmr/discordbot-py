@@ -202,7 +202,7 @@ gavlines = [
 ]
 
 @bot.command(name='가브리엘')
-async def 베네(ctx):
+async def 가브리엘(ctx):
     random_gav = random.choice(gavlines)
     await ctx.reply(random_gav)
     
