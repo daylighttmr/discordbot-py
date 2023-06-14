@@ -176,8 +176,8 @@ lastnames = [
     "크레이그 켈먼", "다니엘 포터필드", "오스틴 박"
 ]
 
-@bot.command(name='random_names')
-async def random_names(ctx):
+@bot.command(name='FMK')
+async def FMK(ctx):
     selected_names = random.sample(lastnames, 3)
     response = '\n'.join(selected_names)
     await ctx.reply(response)
